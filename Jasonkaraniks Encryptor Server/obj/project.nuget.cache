@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "HN+wYIluhg6g7lzR55ErDdoFOUiaEkKId7N/ZHxsUlluhXI8tf9YeAowwL8r86OIplffrjxLFh8qrXbBFRUgYg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Jason\\source\\repos\\Jasonkaraniks Encryptor Server\\Jasonkaraniks Encryptor Server\\Jasonkaraniks Encryptor Server.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Jason\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512"
+  ],
+  "logs": []
+}
