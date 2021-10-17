@@ -7,6 +7,7 @@ curl -X POST http://localhost:45576/encrypt -H "Content-Type: application/json" 
   "key": "my key",
   "useHashing": true
 }
+```
 
 Success:
 ```json
@@ -33,6 +34,7 @@ curl -X POST http://localhost:45576/decrypt -H "Content-Type: application/json" 
   "key": "my key",
   "useHashing": true
 }
+```
 
 Success:
 ```json
