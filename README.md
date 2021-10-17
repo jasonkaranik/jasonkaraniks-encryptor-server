@@ -1,5 +1,5 @@
 
-#Encrypting
+# Encrypting
 ```cURL
 curl -X POST http://localhost:45576/encrypt -H "Content-Type: application/json" --data-binary @- <<DATA
 {
@@ -25,7 +25,7 @@ Fail:
 ```
 
 
-#Decrypting
+# Decrypting
 ```cURL
 curl -X POST http://localhost:45576/decrypt -H "Content-Type: application/json" --data-binary @- <<DATA
 {
