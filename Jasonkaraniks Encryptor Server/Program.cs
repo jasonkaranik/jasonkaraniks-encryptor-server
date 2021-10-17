@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace Jasonkaraniks_Encryptor_Server
 {
@@ -17,77 +16,81 @@ namespace Jasonkaraniks_Encryptor_Server
         {
             while (true)
             {
-                HttpListenerContext ctx = await listener.GetContextAsync();
-
-                HttpListenerRequest req = ctx.Request;
-                HttpListenerResponse resp = ctx.Response;
-
-                byte[] data = null;
-
-                if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/"))
+                try
                 {
-                    data = Encoding.UTF8.GetBytes("Hi");
-                }
-                else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/encrypt"))
-                {
-                    if (!req.HasEntityBody)
-                    {
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
-                    }
-                    System.IO.Stream body = req.InputStream;
-                    System.Text.Encoding encoding = req.ContentEncoding;
-                    System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
-                    dynamic s = JsonConvert.DeserializeObject(reader.ReadToEnd());
-                    body.Close();
-                    reader.Close();
-                    String d = (String)s.data;
-                    String key = (String)s.key;
-                    bool useHashing = (bool)s.useHashing;
-                    if (s.data != null && s.key != null && s.useHashing != null)
-                    {
-                        String enc = Encryptor.Encrypt(d, key, useHashing);
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, encrypted = enc }));
-                    }
-                    else
-                    {
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
-                    }
-                }
-                else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/decrypt"))
-                {
-                    if (!req.HasEntityBody)
-                    {
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
-                    }
-                    System.IO.Stream body = req.InputStream;
-                    System.Text.Encoding encoding = req.ContentEncoding;
-                    System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
-                    dynamic s = JsonConvert.DeserializeObject(reader.ReadToEnd());
-                    body.Close();
-                    reader.Close();
-                    String d = (String)s.data;
-                    String key = (String)s.key;
-                    bool useHashing = (bool)s.useHashing;
-                    if (s.data != null && s.key != null && s.useHashing != null)
-                    {
-                        String enc = Encryptor.Decrypt(d, key, useHashing);
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, decrypted = enc }));
-                    }
-                    else
-                    {
-                        data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
-                    }
-                }
+                    HttpListenerContext ctx = await listener.GetContextAsync();
 
-                if (data == null) data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                    HttpListenerRequest req = ctx.Request;
+                    HttpListenerResponse resp = ctx.Response;
 
-                resp.ContentEncoding = Encoding.UTF8;
-                resp.ContentType = "application/json";
-                resp.ContentLength64 = data.LongLength;
-                resp.StatusCode = 200;
+                    byte[] data = null;
 
-                await resp.OutputStream.WriteAsync(data, 0, data.Length);
-                resp.Close();
+                    if ((req.HttpMethod == "GET") && (req.Url.AbsolutePath == "/"))
+                    {
+                        data = Encoding.UTF8.GetBytes("Hi");
+                    }
+                    else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/encrypt"))
+                    {
+                        if (!req.HasEntityBody)
+                        {
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                        }
+                        System.IO.Stream body = req.InputStream;
+                        System.Text.Encoding encoding = req.ContentEncoding;
+                        System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
+                        dynamic s = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                        body.Close();
+                        reader.Close();
+                        String d = (String)s.data;
+                        String key = (String)s.key;
+                        bool useHashing = (bool)s.useHashing;
+                        if (s.data != null && s.key != null && s.useHashing != null)
+                        {
+                            String enc = Encryptor.Encrypt(d, key, useHashing);
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, encrypted = enc }));
+                        }
+                        else
+                        {
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                        }
+                    }
+                    else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/decrypt"))
+                    {
+                        if (!req.HasEntityBody)
+                        {
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                        }
+                        System.IO.Stream body = req.InputStream;
+                        System.Text.Encoding encoding = req.ContentEncoding;
+                        System.IO.StreamReader reader = new System.IO.StreamReader(body, encoding);
+                        dynamic s = JsonConvert.DeserializeObject(reader.ReadToEnd());
+                        body.Close();
+                        reader.Close();
+                        String d = (String)s.data;
+                        String key = (String)s.key;
+                        bool useHashing = (bool)s.useHashing;
+                        if (s.data != null && s.key != null && s.useHashing != null)
+                        {
+                            String enc = Encryptor.Decrypt(d, key, useHashing);
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, decrypted = enc }));
+                        }
+                        else
+                        {
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                        }
+                    }
+
+                    if (data == null) data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+
+                    resp.ContentEncoding = Encoding.UTF8;
+                    resp.ContentType = "application/json";
+                    resp.ContentLength64 = data.LongLength;
+                    resp.StatusCode = 200;
+
+                    await resp.OutputStream.WriteAsync(data, 0, data.Length);
+                    resp.Close();
+                }
+                catch { }
             }
         }
 
