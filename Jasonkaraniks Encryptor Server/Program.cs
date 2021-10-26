@@ -1,16 +1,19 @@
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Jasonkaraniks_Encryptor_Server
 {
     static class Program
     {
         public static HttpListener listener;
-        public static string url = "http://localhost:45576/";
+
+        public static dynamic conf = null;
 
         public static async Task HandleIncomingConnections()
         {
@@ -100,14 +103,22 @@ namespace Jasonkaraniks_Encryptor_Server
         [STAThread]
         static void Main()
         {
-            if (Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).Length > 1)
-            {
-                return;
+            if (!File.Exists(Application.StartupPath + "\\config.json")) {
+                File.WriteAllText(Application.StartupPath + @"\config.json", JsonConvert.SerializeObject(new { }));
             }
+
+            conf = JsonConvert.DeserializeObject(File.ReadAllText(Application.StartupPath + @"\config.json"));
+
+            if (conf.URL == null) {
+                conf.URL = "http://localhost:45576/";
+            }
+
+            File.WriteAllText(Application.StartupPath + "\\config.json", JsonConvert.SerializeObject(conf));
+
             Console.WriteLine("Server running!");
 
             listener = new HttpListener();
-            listener.Prefixes.Add(url);
+            listener.Prefixes.Add((String)conf.URL);
             listener.Start();
 
             Task listenTask = HandleIncomingConnections();
@@ -115,6 +126,6 @@ namespace Jasonkaraniks_Encryptor_Server
 
             // Close the listener
             listener.Close();
-        }
+        } 
     }
 }
