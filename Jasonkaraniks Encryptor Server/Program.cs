@@ -46,15 +46,22 @@ namespace Jasonkaraniks_Encryptor_Server
                         reader.Close();
                         String d = (String)s.data;
                         String key = (String)s.key;
+                        String password = (String)s.password;
                         bool useHashing = (bool)s.useHashing;
-                        if (s.data != null && s.key != null && s.useHashing != null)
+                        if (s.data != null && s.password != null && s.key != null && s.useHashing != null)
                         {
-                            String enc = Encryptor.Encrypt(d, key, useHashing);
-                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, encrypted = enc }));
+                            if (s.password == conf.Password)
+                            {
+                                String enc = Encryptor.Encrypt(d, key, useHashing);
+                                data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, encrypted = enc }));
+                            }
+                            else {
+                                // Error handled below.
+                            }
                         }
                         else
                         {
-                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                            // Error handled below.
                         }
                     }
                     else if ((req.HttpMethod == "POST") && (req.Url.AbsolutePath == "/decrypt"))
@@ -72,18 +79,35 @@ namespace Jasonkaraniks_Encryptor_Server
                         String d = (String)s.data;
                         String key = (String)s.key;
                         bool useHashing = (bool)s.useHashing;
-                        if (s.data != null && s.key != null && s.useHashing != null)
+                        if (s.data != null && s.password != null && s.key != null && s.useHashing != null)
                         {
-                            String enc = Encryptor.Decrypt(d, key, useHashing);
-                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, decrypted = enc }));
+                            if (s.password == conf.Password)
+                            {
+                                String dec = Encryptor.Decrypt(d, key, useHashing);
+                                data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = true, decrypted = dec }));
+                            }
+                            else
+                            {
+                                // Error handled below.
+                            }
                         }
                         else
                         {
-                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                            // Error handled below.
                         }
                     }
 
-                    if (data == null) data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                    if (data == null) {
+                        if (conf.showError != null)
+                        {
+                            if (conf.showError == true) {
+                                data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                            }
+                        }
+                        else {
+                            data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new { success = false }));
+                        }
+                    }
 
                     resp.ContentEncoding = Encoding.UTF8;
                     resp.ContentType = "application/json";
@@ -109,12 +133,23 @@ namespace Jasonkaraniks_Encryptor_Server
 
             conf = JsonConvert.DeserializeObject(File.ReadAllText(Application.StartupPath + @"\config.json"));
 
-            if (conf.URL == null) {
+            if (conf.URL == null)
+            {
                 conf.URL = "http://localhost:45576/";
             }
 
-            File.WriteAllText(Application.StartupPath + "\\config.json", JsonConvert.SerializeObject(conf));
+            if (conf.Password == null)
+            {
+                conf.Password = "123";
+            }
 
+            if (conf.showError == null)
+            {
+                conf.showError = true;
+            }
+
+            File.WriteAllText(Application.StartupPath + "\\config.json", JsonConvert.SerializeObject(conf));
+                   
             Console.WriteLine("Server running!");
 
             listener = new HttpListener();
